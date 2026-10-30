@@ -97,7 +97,7 @@
     </div>
 
     <div class="posts-list" id="posts-container">
-      {{ range .Paginator.Pages }}
+      {{ range (.Paginate .RegularPages).Pages }}
         {{ $dataTags := "" }}
         {{ if .Params.tags }}
           {{ $dataTags = delimit .Params.tags "," }}

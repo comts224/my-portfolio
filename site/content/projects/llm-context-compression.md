@@ -2,7 +2,7 @@
 title: "LLM 긴 문맥 압축 연구"
 date: 2026-10-31
 draft: false
-type: "posts"
+type: "projects"
 ---
 
 ## 프로젝트 개요
