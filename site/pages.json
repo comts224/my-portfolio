@@ -22,5 +22,19 @@
   "theme": [
     "template"
   ],
-  "title": "My Portfolio"
+  "title": "My Portfolio",
+  "menus": {
+    "main": [
+      {
+        "name": "Home",
+        "pageRef": "/",
+        "weight": 10
+      },
+      {
+        "name": "About",
+        "pageRef": "/about",
+        "weight": 20
+      }
+    ]
+  }
 }
