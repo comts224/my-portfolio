@@ -1,14 +1,12 @@
-\---
-
+﻿---
 title: "About Me"
 
 type: "about"
-
-\---
-
+---
 
 
-\## 자기소개
+
+## 자기소개
 
 
 
@@ -22,11 +20,11 @@ type: "about"
 
 
 
-\## 관심 분야
+## 관심 분야
 
 
 
-\### LLM
+### LLM
 
 
 
@@ -40,7 +38,7 @@ type: "about"
 
 
 
-\### 웹 개발
+### 웹 개발
 
 
 
@@ -50,21 +48,21 @@ HTML, CSS, JavaScript와 GitHub를 학습하며
 
 
 
-\## 현재 학습 중인 기술
+## 현재 학습 중인 기술
 
 
 
-\- Python
+- Python
 
-\- Git 및 GitHub
+- Git 및 GitHub
 
-\- HTML, CSS
+- HTML, CSS
 
-\- 머신러닝 및 인공지능 기초
+- 머신러닝 및 인공지능 기초
 
 
 
-\## 학습 목표
+## 학습 목표
 
 
 
@@ -80,9 +78,10 @@ LLM과 웹 개발에 대한 이해를 높이고,
 
 
 
-\## GitHub
+## GitHub
 
 
 
-\[GitHub 프로필](https://github.com/comts224)
+[GitHub 프로필](https://github.com/comts224)
+
 
