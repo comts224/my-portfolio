@@ -23,6 +23,9 @@
     "template"
   ],
   "title": "My Portfolio",
+  "outputs": {
+    "home": ["HTML", "RSS", "JSON"]
+  },
   "menus": {
     "main": [
       {
