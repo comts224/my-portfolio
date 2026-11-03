@@ -29,20 +29,25 @@
   "menus": {
     "main": [
       {
-        "name": "Home",
+        "name": "홈",
         "pageRef": "/",
         "weight": 10
       },
       {
-        "name": "About",
+        "name": "소개",
         "pageRef": "/about",
         "weight": 20
       },
 	{
-  	"name": "Projects",
+  	"name": "프로젝트",
  	 "pageRef": "/projects",
  	 "weight": 30
-	}
+	},
+       {
+        "name": "데모",
+        "url": "https://comts224.github.io/my-portfolio/demo/",
+        "weight": 40
+       }
     ]
   }
 }
