@@ -15,7 +15,7 @@ type: "projects"
 
 연구에서 다룬 문맥 선택 방식을 간단한 웹 데모로 체험할 수 있습니다. 직접 문서와 질문을 입력하고, Truncate와 BM25 방식의 결과를 비교해 보세요.
 
-**[🧪 문맥 압축 데모 실행하기](https://comts224.github.io/my-portfolio/demo/)**
+**[🧪 데모 체험하기 ↗](https://comts224.github.io/my-portfolio/demo/)**
 
 > 이 데모는 문맥 선택 원리를 이해하기 위한 교육용 프로그램이며, 실제 LLM 답변 생성이나 연구 실험 결과를 재현하는 도구는 아닙니다.
 

@@ -59,3 +59,25 @@ main {
   padding: var(--spacing-xl) var(--spacing-lg);
   min-height: calc(100vh - 200px);
 }
+
+/* Compact button for the interactive LLM demo */
+p strong > a[href="https://comts224.github.io/my-portfolio/demo/"] {
+  display: inline-block;
+  padding: 0.55rem 0.9rem;
+  border-radius: 0.5rem;
+  background-color: #6d28d9;
+  color: #ffffff !important;
+  text-decoration: none !important;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  transition: background-color 0.2s ease;
+}
+
+p strong > a[href="https://comts224.github.io/my-portfolio/demo/"]:hover {
+  background-color: #5b21b6;
+}
+
+p strong > a[href="https://comts224.github.io/my-portfolio/demo/"]:focus-visible {
+  outline: 3px solid #a78bfa;
+  outline-offset: 3px;
+}
