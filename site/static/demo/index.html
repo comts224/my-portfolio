@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Truncate와 BM25를 비교하는 문맥 선택 교육용 데모">
+  <title>LLM 문맥 압축 데모 | My Portfolio</title>
+  <style>
+    :root {color-scheme:dark; font-family:system-ui,'Malgun Gothic',sans-serif; background:#101827; color:#edf3fc}
+    * {box-sizing:border-box}
+    body {margin:0; line-height:1.65}
+    main {max-width:1050px; margin:auto; padding:34px 20px 64px}
+    a {color:#a9d0ff}
+    h1 {font-size:clamp(1.6rem,4vw,2.4rem); margin:20px 0 8px}
+    h2 {font-size:1.2rem; margin:0 0 12px}
+    .muted {color:#b9c6db}
+    .panel {background:#192538; border:1px solid #34465f; border-radius:16px; padding:20px; margin:20px 0}
+    .grid {display:grid; grid-template-columns:1fr 1fr; gap:16px}
+    textarea,input[type=text] {width:100%; border:1px solid #697d97; background:#0e1726; color:#fff; border-radius:10px; padding:12px; font:inherit}
+    textarea {min-height:185px; resize:vertical}
+    label {display:block; font-weight:700; margin:10px 0 6px}
+    input[type=range] {width:100%; accent-color:#96c7ff}
+    button {background:#b9dbff; border:0; color:#101827; padding:11px 18px; border-radius:10px; font:inherit; font-weight:700; cursor:pointer}
+    button.secondary {background:#344862; color:#fff}
+    button:hover {filter:brightness(1.08)}
+    :focus-visible {outline:3px solid #ffdb7b; outline-offset:3px}
+    .actions {display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
+    .result {white-space:pre-wrap; overflow-wrap:anywhere; background:#0e1726; border:1px solid #34465f; border-radius:10px; padding:14px; min-height:130px}
+    .stats {font-weight:700; color:#d4eaff; margin-bottom:10px}
+    .note {font-size:.91rem; color:#b9c6db}
+    @media(max-width:720px) {.grid {grid-template-columns:1fr} main {padding:20px 14px 48px} .panel{padding:15px}}
+  </style>
+</head>
+<body>
+<main>
+  <a href="../">← 포트폴리오 홈으로</a>
+  <h1>LLM 문맥 압축 방식 비교</h1>
+  <p class="muted">질문에 맞는 문맥을 고르는 과정을 직접 체험해 보세요.</p>
+  <p class="note">교육용 브라우저 데모입니다. 실제 LLM 답변 생성이나 연구 결과 재현은 하지 않으며, 아래의 예산은 토큰 수가 아닌 <strong>글자 수</strong> 기준입니다. 입력 내용은 서버로 전송되지 않습니다.</p>
+  <section class="panel" aria-labelledby="input-title">
+    <h2 id="input-title">1. 원본과 질문 입력</h2>
+    <label for="context">원본 문서</label>
+    <textarea id="context" maxlength="20000" placeholder="비교할 문서를 입력하세요."></textarea>
+    <label for="question">질문</label>
+    <input id="question" type="text" maxlength="300" placeholder="예: 문맥 압축은 왜 필요한가요?">
+    <label for="budget">선택할 문맥의 최대 글자 수: <output id="budget-value" for="budget">160</output>자</label>
+    <input id="budget" type="range" min="40" max="600" step="20" value="160">
+    <div class="actions">
+      <button type="button" id="compare">두 방식 비교하기</button>
+      <button type="button" id="example" class="secondary">예제 불러오기</button>
+      <button type="button" id="clear" class="secondary">입력 지우기</button>
+    </div>
+    <p class="note" id="message" role="status" aria-live="polite"></p>
+  </section>
+  <section class="grid" aria-label="압축 결과 비교">
+    <div class="panel">
+      <h2>2. Truncate</h2>
+      <p class="note">문서의 앞부분을 글자 수 제한까지 유지합니다.</p>
+      <div id="truncate-stats" class="stats">비교 전</div>
+      <div id="truncate-result" class="result" aria-live="polite"></div>
+    </div>
+    <div class="panel">
+      <h2>3. BM25 문장 선택</h2>
+      <p class="note">질문 단어와의 관련성 점수가 높은 문장을 고른 뒤 원래 순서로 표시합니다. 한국어 형태소 분석을 사용하지 않는 간단한 구현입니다.</p>
+      <div id="bm25-stats" class="stats">비교 전</div>
+      <div id="bm25-result" class="result" aria-live="polite"></div>
+    </div>
+  </section>
+  <p class="note">주의: BM25는 문장 검색 점수이며 문장을 새로 요약하는 생성형 압축 방식이 아닙니다. 문장부호와 띄어쓰기에 따라 결과가 달라질 수 있습니다.</p>
+</main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const tokenize = text => text.toLowerCase().match(/[가-힣a-z0-9]+/g) || [];
+const splitSentences = text => (text.match(/[^.!?\n]+[.!?]?/g) || []).map(x=>x.trim()).filter(Boolean);
+function chooseBM25(text, question, budget) {
+  const sentences = splitSentences(text);
+  const qTerms = [...new Set(tokenize(question))];
+  if (!sentences.length || !qTerms.length) return '';
+  const docs = sentences.map(tokenize);
+  const avg = docs.reduce((sum,t)=>sum+t.length,0)/docs.length || 1;
+  const N = docs.length;
+  const scored = docs.map((tokens,i)=>{
+    let score=0;
+    for (const term of qTerms) {
+      const tf=tokens.filter(t=>t===term).length;
+      if (!tf) continue;
+      const df=docs.filter(d=>d.includes(term)).length;
+      const idf=Math.log(1+(N-df+0.5)/(df+0.5));
+      score += idf*(tf*2.5)/(tf+1.5*(0.25+0.75*tokens.length/avg));
+    }
+    return {i,score};
+  }).sort((a,b)=>b.score-a.score || a.i-b.i);
+  const selected=[];
+  let used=0;
+  for (const item of scored) {
+    if (item.score<=0) break;
+    const sentence=sentences[item.i];
+    const extra=sentence.length+(selected.length?1:0);
+    if (used+extra<=budget) {selected.push(item.i);used+=extra;}
+  }
+  return selected.sort((a,b)=>a-b).map(i=>sentences[i]).join(' ');
+}
+function updateResult(name, original, selected) {
+  $(name+'-result').textContent=selected || '선택된 문장이 없습니다.';
+  const reduction=original.length ? Math.round(100*(1-selected.length/original.length)) : 0;
+  $(name+'-stats').textContent=`${original.length}자 → ${selected.length}자 · 길이 감소 ${reduction}%`;
+}
+$('budget').addEventListener('input',()=>{$('budget-value').textContent=$('budget').value;});
+$('example').addEventListener('click',()=>{
+  $('context').value='긴 문서를 언어 모델에 그대로 전달하면 입력 토큰이 많아집니다. 문맥 압축은 필요한 정보를 선별해 입력 길이를 줄이는 접근입니다. Truncate는 문서 앞부분부터 일정 길이까지만 유지합니다. 따라서 중요한 내용이 뒤에 있으면 누락될 수 있습니다. BM25는 질문의 단어와 문장 사이의 관련성을 계산하는 검색 기법입니다. BM25를 사용하면 질문과 가까운 문장을 우선 선택할 수 있습니다. 다만 질문의 의미를 깊게 이해하거나 답변 정확도를 보장하지는 않습니다.';
+  $('question').value='BM25는 질문과 관련된 문장을 어떻게 선택하나요?';
+  $('message').textContent='예제 문서를 불러왔습니다. 비교하기를 눌러주세요.';
+});
+$('clear').addEventListener('click',()=>{
+  $('context').value='';$('question').value='';$('message').textContent='입력을 지웠습니다.';
+  for(const name of ['truncate','bm25']) {$(name+'-result').textContent='';$(name+'-stats').textContent='비교 전';}
+});
+$('compare').addEventListener('click',()=>{
+  const text=$('context').value.trim(), question=$('question').value.trim(), budget=Number($('budget').value);
+  if(!text || !question) {$('message').textContent='문서와 질문을 모두 입력해 주세요.'; return;}
+  const truncate=text.slice(0,budget);
+  const bm25=chooseBM25(text,question,budget);
+  updateResult('truncate',text,truncate);
+  updateResult('bm25',text,bm25);
+  $('message').textContent='비교가 완료됐습니다. 선택된 문맥의 내용과 길이를 확인하세요.';
+});
+</script>
+</body>
+</html>
