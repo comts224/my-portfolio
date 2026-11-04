@@ -22,3 +22,16 @@ title: About Me
 ## GitHub
 
 [나의 GitHub](https://github.com/comts224)
+## 주요 프로젝트
+
+### JCodeQuest — 코딩 문제 풀이 플랫폼
+
+팀 프로젝트에서 Ranking, MyPage, UserProfile 페이지를 개발하고 Docker 및 Supabase 연동 문제를 해결했습니다.
+
+[JCodeQuest 프로젝트 자세히 보기](projects/jcodequest/)
+
+### LLM 긴 문맥 압축 연구
+
+Truncate, BM25, Compress, Hybrid 방식을 비교하며 답변 정확도와 토큰 효율성을 분석했습니다.
+
+[LLM 연구 자세히 보기](projects/llm-context-compression/)
