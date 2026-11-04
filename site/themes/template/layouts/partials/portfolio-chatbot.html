@@ -1,0 +1,39 @@
+﻿<link rel="stylesheet" href="{{ "chatbot/chatbot.css" | relURL }}">
+
+<aside id="portfolio-chatbot"
+  data-about="{{ "about/" | relURL }}"
+  data-project="{{ "projects/llm-context-compression/" | relURL }}"
+  data-demo="{{ "demo/" | relURL }}">
+
+  <button id="chat-toggle" type="button"
+    aria-expanded="false" aria-controls="chat-panel">
+    💬 포트폴리오 도우미
+  </button>
+
+  <section id="chat-panel" aria-label="포트폴리오 챗봇" hidden>
+    <div class="chat-header">
+      <strong>포트폴리오 도우미</strong>
+      <button id="chat-close" type="button" aria-label="채팅창 닫기">✕</button>
+    </div>
+
+    <div id="chat-messages" role="log" aria-live="polite"
+      aria-label="채팅 메시지"></div>
+
+    <div class="chat-suggestions">
+      <button type="button" data-question="어떤 프로젝트를 했나요?">프로젝트</button>
+      <button type="button" data-question="어떤 기술을 사용했나요?">사용 기술</button>
+      <button type="button" data-question="연구 결과는 어떤가요?">연구 결과</button>
+    </div>
+
+    <form id="chat-form">
+      <label for="chat-input" class="chat-label">질문 입력</label>
+      <div class="chat-input-row">
+        <input id="chat-input" type="text" maxlength="300"
+          placeholder="궁금한 내용을 입력하세요" autocomplete="off">
+        <button type="submit">전송</button>
+      </div>
+    </form>
+  </section>
+</aside>
+
+<script src="{{ "chatbot/chatbot.js" | relURL }}" defer></script>
