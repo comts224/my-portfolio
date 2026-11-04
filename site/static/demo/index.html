@@ -116,6 +116,17 @@ $('clear').addEventListener('click',()=>{
   $('context').value='';$('question').value='';$('message').textContent='입력을 지웠습니다.';
   for(const name of ['truncate','bm25']) {$(name+'-result').textContent='';$(name+'-stats').textContent='비교 전';}
 });
+function invalidateResults() {
+  for (const name of ['truncate', 'bm25']) {
+    $(name + '-result').textContent = '';
+    $(name + '-stats').textContent = '비교 전';
+  }
+  $('message').textContent = '입력 내용이 변경되었습니다. 다시 비교해 주세요.';
+}
+
+$('context').addEventListener('input', invalidateResults);
+$('question').addEventListener('input', invalidateResults);
+
 $('compare').addEventListener('click',()=>{
   const text=$('context').value.trim(), question=$('question').value.trim(), budget=Number($('budget').value);
   if(!text || !question) {$('message').textContent='문서와 질문을 모두 입력해 주세요.'; return;}
