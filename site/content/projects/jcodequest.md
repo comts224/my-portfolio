@@ -1,6 +1,6 @@
-﻿---
+---
 title: "JCodeQuest — 코딩 문제 풀이 플랫폼"
-date: 2026-11-05
+date: 2026-11-05T00:00:00+09:00
 draft: false
 description: "Ranking, MyPage, UserProfile 개발과 Docker·Supabase 연동 경험을 정리한 팀 프로젝트"
 tags: ["Web", "React", "Docker", "Supabase", "Git"]
