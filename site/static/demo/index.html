@@ -102,7 +102,7 @@ function chooseBM25(text, question, budget) {
   return selected.sort((a,b)=>a-b).map(i=>sentences[i]).join(' ');
 }
 function updateResult(name, original, selected) {
-  $(name+'-result').textContent=selected || '선택된 문장이 없습니다.';
+  $(name+'-result').textContent=selected || (name === 'bm25' ? '질문과 일치하는 단어가 없어 문장을 선택하지 못했거나, 선택 가능한 문장이 글자 수 제한을 초과했습니다. 질문 또는 글자 수 제한을 조정해 주세요.' : '선택된 문장이 없습니다.');
   const reduction=original.length ? Math.round(100*(1-selected.length/original.length)) : 0;
   $(name+'-stats').textContent=`${original.length}자 → ${selected.length}자 · 길이 감소 ${reduction}%`;
 }
