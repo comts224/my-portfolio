@@ -78,6 +78,7 @@
   </section>
   <p class="note">주의: BM25는 문장 검색 점수이며 문장을 새로 요약하는 생성형 압축 방식이 아닙니다. 문장부호와 띄어쓰기에 따라 결과가 달라질 수 있습니다.</p>
 </main>
+<script src="./truncate.js"></script>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
@@ -263,7 +264,7 @@ $('question').addEventListener('input', invalidateResults);
 $('compare').addEventListener('click',()=>{
   const text=$('context').value.trim(), question=$('question').value.trim(), budget=Number($('budget').value);
   if(!text || !question) {$('message').textContent='문서와 질문을 모두 입력해 주세요.'; return;}
-  const truncate=text.slice(0,budget);
+  const truncate=truncateContext(text,budget);
   const bm25=chooseBM25(text,question,budget);
   updateResult('truncate',text,truncate);
   updateResult('bm25',text,bm25);
