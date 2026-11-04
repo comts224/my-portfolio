@@ -32,3 +32,30 @@ test('BM25: 선택된 문장의 원문 위치와 점수를 기록한다', () => 
   assert.equal(scores[0].index, 2);
   assert.ok(scores[0].score > 0);
 });
+
+test('BM25: 질문이 비어 있으면 빈 결과를 반환한다', () => {
+  const result = chooseBM25('사과는 맛있다.', '', 100);
+  assert.equal(result, '');
+  assert.deepEqual(getSelectedScores(), []);
+});
+
+test('BM25: 문서가 비어 있으면 빈 결과를 반환한다', () => {
+  const result = chooseBM25('', '사과', 100);
+  assert.equal(result, '');
+  assert.deepEqual(getSelectedScores(), []);
+});
+
+test('BM25: 관련 문장이 여러 개여도 글자 수 제한을 지킨다', () => {
+  const text = '사과는 빨갛다. 사과는 맛있다. 바나나는 노랗다.';
+  const result = chooseBM25(text, '사과는', 20);
+  assert.ok(result.length <= 20);
+  assert.ok(result.includes('사과는'));
+});
+
+test('BM25: 다음 검색에서 이전 문장의 점수가 남지 않는다', () => {
+  chooseBM25('사과는 맛있다.', '사과는', 100);
+  assert.equal(getSelectedScores().length, 1);
+
+  chooseBM25('바나나는 노랗다.', '자동차', 100);
+  assert.deepEqual(getSelectedScores(), []);
+});
