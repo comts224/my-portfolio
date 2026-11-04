@@ -73,7 +73,9 @@
 const $ = id => document.getElementById(id);
 const tokenize = text => text.toLowerCase().match(/[가-힣a-z0-9]+/g) || [];
 const splitSentences = text => (text.match(/[^.!?\n]+[.!?]?/g) || []).map(x=>x.trim()).filter(Boolean);
+let bm25SelectedScores = [];
 function chooseBM25(text, question, budget) {
+  bm25SelectedScores = [];
   const sentences = splitSentences(text);
   const qTerms = [...new Set(tokenize(question))];
   if (!sentences.length || !qTerms.length) return '';
@@ -99,6 +101,10 @@ function chooseBM25(text, question, budget) {
     const extra=sentence.length+(selected.length?1:0);
     if (used+extra<=budget) {selected.push(item.i);used+=extra;}
   }
+  bm25SelectedScores = selected.map(i => ({
+    index: i + 1,
+    score: scored.find(item => item.i === i).score
+  }));
   return selected.sort((a,b)=>a-b).map(i=>sentences[i]).join(' ');
 }
 function highlightQuestionTerms(container, text, question) {
@@ -123,11 +129,28 @@ function highlightQuestionTerms(container, text, question) {
 function updateResult(name, original, selected) {
   if (name === 'bm25' && selected) {
     highlightQuestionTerms($(name+'-result'), selected, $('question').value);
+
+    const scoreInfo = document.createElement('div');
+    scoreInfo.style.marginTop = '16px';
+    scoreInfo.style.fontSize = '0.85em';
+    scoreInfo.style.color = '#b8cbe5';
+
+    const scores = [...bm25SelectedScores].sort((a, b) => b.score - a.score);
+    scoreInfo.textContent = '선택 문장별 BM25 점수 (높은 순): ' +
+      scores.map(item =>
+        `원문 ${item.index}번째 문장 ${item.score.toFixed(3)}점`
+      ).join(' / ');
+
+    $(name+'-result').appendChild(scoreInfo);
   } else {
   $(name+'-result').textContent=selected || (name === 'bm25' ? '질문과 일치하는 단어가 없어 문장을 선택하지 못했거나, 선택 가능한 문장이 글자 수 제한을 초과했습니다. 질문 또는 글자 수 제한을 조정해 주세요.' : '선택된 문장이 없습니다.');
   }
   const reduction=original.length ? Math.round(100*(1-selected.length/original.length)) : 0;
-  $(name+'-stats').textContent=`${original.length}자 → ${selected.length}자 · 길이 감소 ${reduction}%`;
+  const questionTerms = new Set(tokenize($('question').value));
+  const selectedTerms = new Set(tokenize(selected));
+  const matchedCount = [...questionTerms].filter(term => selectedTerms.has(term)).length;
+  $(name+'-stats').textContent =
+    `${original.length}자 → ${selected.length}자 · 길이 감소 ${reduction}% · 질문 일치 단어 ${matchedCount}/${questionTerms.size}개`;
 }
 $('budget').addEventListener('input',()=>{$('budget-value').textContent=$('budget').value;});
 $('example').addEventListener('click',()=>{
