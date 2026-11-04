@@ -26,6 +26,9 @@
     :focus-visible {outline:3px solid #ffdb7b; outline-offset:3px}
     .actions {display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
     .result {white-space:pre-wrap; overflow-wrap:anywhere; background:#0e1726; border:1px solid #34465f; border-radius:10px; padding:14px; min-height:130px}
+    .coverage-graph {margin:0 0 14px}
+    .coverage-track {height:12px; border-radius:999px; background:#344862; overflow:hidden}
+    .coverage-fill {height:100%; background:#96c7ff; border-radius:999px}
     .stats {font-weight:700; color:#d4eaff; margin-bottom:10px}
     .note {font-size:.91rem; color:#b9c6db}
     @media(max-width:720px) {.grid {grid-template-columns:1fr} main {padding:20px 14px 48px} .panel{padding:15px}}
@@ -151,6 +154,35 @@ function updateResult(name, original, selected) {
   const matchedCount = [...questionTerms].filter(term => selectedTerms.has(term)).length;
   $(name+'-stats').textContent =
     `${original.length}자 → ${selected.length}자 · 길이 감소 ${reduction}% · 질문 일치 단어 ${matchedCount}/${questionTerms.size}개`;
+
+  const coverage = questionTerms.size ? Math.round(100 * matchedCount / questionTerms.size) : 0;
+  const graph = document.createElement('div');
+  graph.className = 'coverage-graph';
+
+  const track = document.createElement('div');
+  track.className = 'coverage-track';
+  track.setAttribute('role', 'progressbar');
+  track.setAttribute('aria-label', '질문 일치 단어 비율');
+  track.setAttribute('aria-valuemin', '0');
+  track.setAttribute('aria-valuemax', '100');
+  track.setAttribute('aria-valuenow', String(coverage));
+
+  const fill = document.createElement('div');
+  fill.className = 'coverage-fill';
+  fill.style.width = coverage + '%';
+  track.appendChild(fill);
+
+  const label = document.createElement('div');
+  label.className = 'note';
+  label.textContent = `질문 일치율 ${coverage}%`;
+
+  graph.appendChild(track);
+  graph.appendChild(label);
+
+  const stats = $(name+'-stats');
+  const oldGraph = stats.parentElement.querySelector('.coverage-graph');
+  if (oldGraph) oldGraph.remove();
+  stats.insertAdjacentElement('afterend', graph);
 }
 $('budget').addEventListener('input',()=>{$('budget-value').textContent=$('budget').value;});
 $('example').addEventListener('click',()=>{
@@ -160,12 +192,19 @@ $('example').addEventListener('click',()=>{
 });
 $('clear').addEventListener('click',()=>{
   $('context').value='';$('question').value='';$('message').textContent='입력을 지웠습니다.';
-  for(const name of ['truncate','bm25']) {$(name+'-result').textContent='';$(name+'-stats').textContent='비교 전';}
+  for(const name of ['truncate','bm25']) {
+    $(name+'-result').textContent='';
+    $(name+'-stats').textContent='비교 전';
+    const graph = $(name+'-stats').parentElement.querySelector('.coverage-graph');
+    if (graph) graph.remove();
+  }
 });
 function invalidateResults() {
   for (const name of ['truncate', 'bm25']) {
     $(name + '-result').textContent = '';
     $(name + '-stats').textContent = '비교 전';
+    const graph = $(name + '-stats').parentElement.querySelector('.coverage-graph');
+    if (graph) graph.remove();
   }
   $('message').textContent = '입력 내용이 변경되었습니다. 다시 비교해 주세요.';
 }
