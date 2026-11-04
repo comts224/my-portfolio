@@ -29,6 +29,9 @@
     .coverage-graph {margin:0 0 14px}
     .coverage-track {height:12px; border-radius:999px; background:#344862; overflow:hidden}
     .coverage-fill {height:100%; background:#96c7ff; border-radius:999px}
+    .preview-title {font-size:1rem; margin:18px 0 8px}
+    .source-preview {white-space:pre-wrap; overflow-wrap:anywhere; padding:14px; border:1px solid #34465f; border-radius:10px; background:#0e1726; font-size:.9rem}
+    .source-preview mark {background:#96c7ff; color:#101827; border-radius:3px}
     .stats {font-weight:700; color:#d4eaff; margin-bottom:10px}
     .note {font-size:.91rem; color:#b9c6db}
     @media(max-width:720px) {.grid {grid-template-columns:1fr} main {padding:20px 14px 48px} .panel{padding:15px}}
@@ -61,12 +64,16 @@
       <p class="note">문서의 앞부분을 글자 수 제한까지 유지합니다.</p>
       <div id="truncate-stats" class="stats">비교 전</div>
       <div id="truncate-result" class="result" aria-live="polite"></div>
+      <h3 class="preview-title">원문에서 선택된 부분</h3>
+      <div id="truncate-preview" class="source-preview"></div>
     </div>
     <div class="panel">
       <h2>3. BM25 문장 선택</h2>
       <p class="note">질문 단어와의 관련성 점수가 높은 문장을 고른 뒤 원래 순서로 표시합니다. 한국어 형태소 분석을 사용하지 않는 간단한 구현입니다.</p>
       <div id="bm25-stats" class="stats">비교 전</div>
       <div id="bm25-result" class="result" aria-live="polite"></div>
+      <h3 class="preview-title">원문에서 선택된 부분</h3>
+      <div id="bm25-preview" class="source-preview"></div>
     </div>
   </section>
   <p class="note">주의: BM25는 문장 검색 점수이며 문장을 새로 요약하는 생성형 압축 방식이 아닙니다. 문장부호와 띄어쓰기에 따라 결과가 달라질 수 있습니다.</p>
@@ -128,6 +135,45 @@ function highlightQuestionTerms(container, text, question) {
       container.appendChild(document.createTextNode(part));
     }
   }
+}
+function renderSourcePreview(name, original, selected) {
+  const container = $(name + '-preview');
+  container.textContent = '';
+
+  const ranges = [];
+
+  if (name === 'truncate') {
+    if (selected.length) ranges.push([0, selected.length]);
+  } else {
+    const selectedIndices = new Set(bm25SelectedScores.map(item => item.index - 1));
+    const regex = /[^.!?\n]+[.!?]?/g;
+    let match;
+    let sentenceIndex = 0;
+
+    while ((match = regex.exec(original)) !== null) {
+      const sentence = match[0].trim();
+      if (!sentence) continue;
+
+      if (selectedIndices.has(sentenceIndex)) {
+        const start = match.index + match[0].indexOf(sentence);
+        ranges.push([start, start + sentence.length]);
+      }
+      sentenceIndex++;
+    }
+  }
+
+  let position = 0;
+  for (const [start, end] of ranges) {
+    container.appendChild(document.createTextNode(original.slice(position, start)));
+
+    const mark = document.createElement('mark');
+    mark.textContent = original.slice(start, end);
+    container.appendChild(mark);
+
+    position = end;
+  }
+
+  container.appendChild(document.createTextNode(original.slice(position)));
 }
 function updateResult(name, original, selected) {
   if (name === 'bm25' && selected) {
@@ -197,6 +243,7 @@ $('clear').addEventListener('click',()=>{
     $(name+'-stats').textContent='비교 전';
     const graph = $(name+'-stats').parentElement.querySelector('.coverage-graph');
     if (graph) graph.remove();
+    $(name + '-preview').textContent = '';
   }
 });
 function invalidateResults() {
@@ -205,6 +252,7 @@ function invalidateResults() {
     $(name + '-stats').textContent = '비교 전';
     const graph = $(name + '-stats').parentElement.querySelector('.coverage-graph');
     if (graph) graph.remove();
+    $(name + '-preview').textContent = '';
   }
   $('message').textContent = '입력 내용이 변경되었습니다. 다시 비교해 주세요.';
 }
@@ -219,6 +267,8 @@ $('compare').addEventListener('click',()=>{
   const bm25=chooseBM25(text,question,budget);
   updateResult('truncate',text,truncate);
   updateResult('bm25',text,bm25);
+  renderSourcePreview('truncate', text, truncate);
+  renderSourcePreview('bm25', text, bm25);
   $('message').textContent='비교가 완료됐습니다. 선택된 문맥의 내용과 길이를 확인하세요.';
 });
 </script>
