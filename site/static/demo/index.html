@@ -101,8 +101,31 @@ function chooseBM25(text, question, budget) {
   }
   return selected.sort((a,b)=>a-b).map(i=>sentences[i]).join(' ');
 }
+function highlightQuestionTerms(container, text, question) {
+  const terms = new Set(tokenize(question));
+  container.textContent = '';
+
+  for (const part of text.split(/([가-힣a-z0-9]+)/gi)) {
+    if (!part) continue;
+
+    if (terms.has(part.toLowerCase())) {
+      const mark = document.createElement('mark');
+      mark.textContent = part;
+      mark.style.backgroundColor = '#fde68a';
+      mark.style.color = '#111827';
+      mark.style.borderRadius = '3px';
+      container.appendChild(mark);
+    } else {
+      container.appendChild(document.createTextNode(part));
+    }
+  }
+}
 function updateResult(name, original, selected) {
+  if (name === 'bm25' && selected) {
+    highlightQuestionTerms($(name+'-result'), selected, $('question').value);
+  } else {
   $(name+'-result').textContent=selected || (name === 'bm25' ? '질문과 일치하는 단어가 없어 문장을 선택하지 못했거나, 선택 가능한 문장이 글자 수 제한을 초과했습니다. 질문 또는 글자 수 제한을 조정해 주세요.' : '선택된 문장이 없습니다.');
+  }
   const reduction=original.length ? Math.round(100*(1-selected.length/original.length)) : 0;
   $(name+'-stats').textContent=`${original.length}자 → ${selected.length}자 · 길이 감소 ${reduction}%`;
 }
