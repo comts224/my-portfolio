@@ -35,3 +35,8 @@ title: About Me
 Truncate, BM25, Compress, Hybrid 방식을 비교하며 답변 정확도와 토큰 효율성을 분석했습니다.
 
 [LLM 연구 자세히 보기](projects/llm-context-compression/)
+### 8-Puzzle — AI 탐색 알고리즘 비교
+
+DFS, BFS, UCS, A* 탐색을 구현하고 휴리스틱에 따른 성능을 비교했습니다.
+
+[8-Puzzle 프로젝트 자세히 보기](projects/8-puzzle/)
