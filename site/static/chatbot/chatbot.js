@@ -39,6 +39,26 @@
       };
     }
 
+    if (/jcodequest|제이코드퀘스트|랭킹|마이페이지|userprofile/.test(q)) {
+      return {
+        text: 'JCodeQuest는 코딩 문제 풀이 플랫폼 팀 프로젝트입니다. Ranking, MyPage, UserProfile 등 프론트엔드 페이지 개발을 담당했으며 Docker Compose와 Supabase 설정 문제를 해결한 경험이 있습니다.',
+        link: {href: root.dataset.jcodequest, label: 'JCodeQuest 자세히 보기'}
+      };
+    }
+
+    if (/8-puzzle|8puzzle|퍼즐|탐색알고리즘/.test(q)) {
+      return {
+        text: '8-Puzzle 프로젝트에서는 DFS, BFS, UCS, A*, RAND 탐색을 구현하고 Misplaced Tiles와 Manhattan Distance 휴리스틱을 사용해 탐색 성능을 비교했습니다.',
+        link: {href: root.dataset.puzzle, label: '8-Puzzle 자세히 보기'}
+      };
+    }
+
+    if (/connect-?6|육목|휴리스틱기반게임/.test(q)) {
+      return {
+        text: 'Connect-6 프로젝트에서는 공격·수비 휴리스틱과 1-ply Greedy 전략을 사용했습니다. 기존 돌 주변 반경 2칸을 탐색했고, 공식 리더보드에서 14전 11승 3패(승률 78.6%)를 기록했습니다.',
+        link: {href: root.dataset.connect6, label: 'Connect-6 자세히 보기'}
+      };
+    }
     if (/데모|체험|실습/.test(q)) {
       return {
         text: 'Truncate와 BM25가 문맥을 선택하는 과정을 직접 비교할 수 있는 교육용 데모가 있습니다.',

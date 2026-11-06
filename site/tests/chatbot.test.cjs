@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -52,7 +52,10 @@ function setupChatbot() {
   root.dataset = {
     about: '/my-portfolio/about/',
     project: '/my-portfolio/projects/llm-context-compression/',
-    demo: '/my-portfolio/demo/'
+    demo: '/my-portfolio/demo/',
+    jcodequest: '/my-portfolio/projects/jcodequest/',
+    puzzle: '/my-portfolio/projects/8-puzzle/',
+    connect6: '/my-portfolio/projects/connect-6-ai/'
   };
 
   const suggestion = createElement();
@@ -150,4 +153,25 @@ test('Chatbot: HTML 입력을 텍스트로 처리한다', () => {
   );
 
   assert.equal(userMessage.children.length, 1);
+});
+
+test('Chatbot: JCodeQuest 질문에 전용 답변과 링크를 제공한다', () => {
+  const chat = setupChatbot();
+  chat.ask('JCodeQuest 알려줘');
+  assert.match(chat.lastMessage().children[0].textContent, /Ranking/);
+  assert.equal(chat.lastMessage().children[1].href, '/my-portfolio/projects/jcodequest/');
+});
+
+test('Chatbot: 8-Puzzle 질문에 전용 답변과 링크를 제공한다', () => {
+  const chat = setupChatbot();
+  chat.ask('8-Puzzle 설명해줘');
+  assert.match(chat.lastMessage().children[0].textContent, /Manhattan Distance/);
+  assert.equal(chat.lastMessage().children[1].href, '/my-portfolio/projects/8-puzzle/');
+});
+
+test('Chatbot: Connect-6 질문에 전용 답변과 링크를 제공한다', () => {
+  const chat = setupChatbot();
+  chat.ask('육목 프로젝트 알려줘');
+  assert.match(chat.lastMessage().children[0].textContent, /78.6%/);
+  assert.equal(chat.lastMessage().children[1].href, '/my-portfolio/projects/connect-6-ai/');
 });
