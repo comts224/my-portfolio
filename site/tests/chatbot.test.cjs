@@ -100,20 +100,22 @@ test('Chatbot: 첫 안내 메시지를 표시한다', () => {
   );
 });
 
-test('Chatbot: 프로젝트 질문에 연구 소개와 링크를 제공한다', () => {
+test('Chatbot: 프로젝트 4개와 전체 목록 링크를 제공한다', () => {
   const chat = setupChatbot();
+  chat.elements['portfolio-chatbot'].dataset.projects = '/my-portfolio/projects/';
 
   chat.ask('어떤 프로젝트를 했나요?');
 
-  assert.match(
-    chat.lastMessage().children[0].textContent,
-    /LLM 긴 문맥 압축 연구/
-  );
+  const message = chat.lastMessage();
+  const links = message.children.slice(1);
 
-  assert.equal(
-    chat.lastMessage().children[1].href,
-    '/my-portfolio/projects/llm-context-compression/'
-  );
+  assert.equal(links.length, 5);
+  assert.equal(links[0].textContent, '1. LLM 긴 문맥 압축 연구');
+  assert.equal(links[0].href, '/my-portfolio/projects/llm-context-compression/');
+  assert.equal(links[1].href, '/my-portfolio/projects/jcodequest/');
+  assert.equal(links[2].href, '/my-portfolio/projects/8-puzzle/');
+  assert.equal(links[3].href, '/my-portfolio/projects/connect-6-ai/');
+  assert.equal(links[4].href, '/my-portfolio/projects/');
 });
 
 test('Chatbot: 연구 결과 질문에 정확한 F1 수치를 제공한다', () => {

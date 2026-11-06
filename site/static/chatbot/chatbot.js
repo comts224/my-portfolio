@@ -20,10 +20,13 @@
     message.appendChild(content);
 
     if (link) {
-      const anchor = document.createElement('a');
-      anchor.href = link.href;
-      anchor.textContent = link.label;
-      message.appendChild(anchor);
+      const links = Array.isArray(link) ? link : [link];
+      links.forEach(item => {
+        const anchor = document.createElement('a');
+        anchor.href = item.href;
+        anchor.textContent = item.label;
+        message.appendChild(anchor);
+      });
     }
 
     messages.appendChild(message);
@@ -82,8 +85,14 @@
 
     if (/프로젝트|연구|논문|무엇을했|뭘했/.test(q)) {
       return {
-        text: '주요 프로젝트는 4가지입니다. ① LLM 긴 문맥 압축 연구: 검색·압축 방법과 성능 비교 ② JCodeQuest: 코딩 문제 풀이 플랫폼 프론트엔드 개발 ③ 8-Puzzle: DFS, BFS, UCS, A* 탐색 알고리즘 비교 ④ Connect-6: 휴리스틱 기반 육목 AI 구현 및 성능 평가입니다.',
-        link: {href: root.dataset.project, label: '프로젝트 소개 보기'}
+        text: '주요 프로젝트는 4개입니다. 아래 번호를 누르면 해당 프로젝트로 이동합니다.',
+        link: [
+          {href: root.dataset.project, label: '1. LLM 긴 문맥 압축 연구'},
+          {href: root.dataset.jcodequest, label: '2. JCodeQuest'},
+          {href: root.dataset.puzzle, label: '3. 8-Puzzle'},
+          {href: root.dataset.connect6, label: '4. Connect-6 AI'},
+          {href: root.dataset.projects, label: '전체 프로젝트 목록 보기'}
+        ]
       };
     }
 
