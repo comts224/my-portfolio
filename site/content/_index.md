@@ -40,3 +40,8 @@ Truncate, BM25, Compress, Hybrid 방식을 비교하며 답변 정확도와 토�
 DFS, BFS, UCS, A* 탐색을 구현하고 휴리스틱에 따른 성능을 비교했습니다.
 
 [8-Puzzle 프로젝트 자세히 보기](projects/8-puzzle/)
+### Connect-6 — 휴리스틱 기반 육목 AI
+
+규칙 기반 의사결정과 공격·수비 휴리스틱을 결합한 게임 AI를 구현했습니다. 공식 리더보드에서 14전 11승 3패, 승률 78.6%를 기록했습니다.
+
+[Connect-6 AI 프로젝트 자세히 보기](projects/connect-6-ai/)
