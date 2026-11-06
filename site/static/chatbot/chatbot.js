@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 (function () {
   const root = document.getElementById('portfolio-chatbot');
@@ -62,7 +62,7 @@
 
     if (/프로젝트|연구|논문|무엇을했|뭘했/.test(q)) {
       return {
-        text: 'LLM 긴 문맥 압축 연구를 수행했습니다. Truncate, BM25, Compress, Hybrid 방식을 비교하며 답변 정확도와 토큰 효율성을 분석했습니다.',
+        text: '주요 프로젝트는 4가지입니다. ① LLM 긴 문맥 압축 연구: 검색·압축 방법과 성능 비교 ② JCodeQuest: 코딩 문제 풀이 플랫폼 프론트엔드 개발 ③ 8-Puzzle: DFS, BFS, UCS, A* 탐색 알고리즘 비교 ④ Connect-6: 휴리스틱 기반 육목 AI 구현 및 성능 평가입니다.',
         link: {href: root.dataset.project, label: '프로젝트 소개 보기'}
       };
     }
